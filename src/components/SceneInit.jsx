@@ -8,7 +8,10 @@ const SceneInit = () => {
     useEffect(() => {
       //----- SCENE -----
       const scene = new THREE.Scene();
-  
+      const background = new THREE.TextureLoader().load('src/assets/background-1.jpg');
+      scene.background = background;
+      
+
   
       //----- CAMERA -----
       const camera = new THREE.PerspectiveCamera(
