@@ -15,7 +15,15 @@ const SceneInit = () => {
     useEffect(() => {
       //----- SCENE -----
       let model;
+      //delete this variable if not using the mesh when done
+      let modelMesh;
+
       let isModelLoaded = false;
+
+      let mouse;
+      let raycaster;
+      let selectedModel;
+
 
       const scene = new THREE.Scene();
       const background = new THREE.TextureLoader().load('src/assets/background-1.jpg');
@@ -29,7 +37,7 @@ const SceneInit = () => {
           1,
           1000
       );
-      // camera.position.z = 1;
+      camera.position.set(0, 10, 40);
     
   
       //----- LIGHTS -----
@@ -53,21 +61,26 @@ const SceneInit = () => {
       // called when the resource is loaded
       (gltf) => {
         model = gltf.scene;
-
         //add model to scene
         scene.add(model);
-
+        
         //get mesh 
         //ONLY HERE IF I NEED IT IN THE FUTURE DELETE IF NOT USING WHEN IM DONE WITH THIS 
-        // modelMesh = model.getObjectByName('Object_7');
-
+        modelMesh = model.getObjectByName('Object_7');
+        
+        //flag as draggable
+        modelMesh.userData.draggable = true;
+        modelMesh.userData.name = 'dog';
+        
+        
         isModelLoaded = true;
       },
       (xhr) => {
         //shows model loading
         console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
       });
-
+      
+      
       
       // ----- PHYSICS -----
       //world for simulated physics
@@ -90,14 +103,24 @@ const SceneInit = () => {
       physicsWorld.addBody(groundBody);
 
       //create box to use as hitbox for models
-      const size = 2
-      const halfExtents = new CANNON.Vec3(size, size, size)
-      const boxShape = new CANNON.Box(halfExtents)
-      const boxBody = new CANNON.Body({ mass: 10, shape: boxShape })
-      boxBody.position.set(0, 10, 0)
-      physicsWorld.addBody(boxBody)
+      const size = 1;
+      const halfExtents = new CANNON.Vec3();
+      if(isModelLoaded){
+        halfExtents.setFromObject(model);
+      };
+      const boxShape = new CANNON.Box(halfExtents);
+      const boxBody = new CANNON.Body({ mass: 10, shape: boxShape });
+      boxBody.position.set(0, 15, 0);
+      
+      physicsWorld.addBody(boxBody);
+      physicsWorld.addBody(boxBody);
+      
 
 
+
+
+
+      
       //----- RENDERER -----
       const canvas = document.getElementById('webgl');
       const renderer =  new THREE.WebGLRenderer({
@@ -110,7 +133,6 @@ const SceneInit = () => {
 
       //----- CONTROLS ----- DELETE WHEN FINISHED -----
       const controls = new OrbitControls( camera, renderer.domElement );
-      camera.position.set( 0, 20, 100 );
       controls.update();
 
 
@@ -119,7 +141,41 @@ const SceneInit = () => {
         // options...
       })
   
-    
+
+
+
+
+      // ----- RAYCASTING -----
+      //for picking model up with mouse
+      mouse = new THREE.Vector2();
+      raycaster = new THREE.Raycaster();
+
+      function translateMousePosition() {
+        // calculate pointer position in normalized device coordinates
+        // (-1 to +1) for both components
+        mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+        mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+      }
+
+
+      function onClick( event ) {
+        translateMousePosition();
+
+        raycaster.setFromCamera(mouse, camera);
+        const found = raycaster.intersectObjects(scene.children);
+        if(found.length > 0 && found[0].object.userData.draggable) {
+          selectedModel = found[0].object;
+          console.log(selectedModel.userData)
+          
+        }
+
+      }
+      
+
+      function onMouseMove() {
+        translateMousePosition();
+      }
+
 
       //----- ANIMATE -----
       const animate = () => {
@@ -127,6 +183,7 @@ const SceneInit = () => {
         
         if(isModelLoaded) {
           model.position.copy(boxBody.position);
+          // model.position.y -= 1;
           model.quaternion.copy(boxBody.quaternion);
         }
         
@@ -144,9 +201,10 @@ const SceneInit = () => {
         renderer.setSize(window.innerWidth, window.innerHeight);
       });
    
-   
-   
-   
+      window.addEventListener('mousemove', onMouseMove)
+      window.addEventListener( 'click', onClick );
+
+
    
    
    
