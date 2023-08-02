@@ -12,21 +12,23 @@ const SceneInit = () => {
 
     //THREE.JS
     useEffect(() => {
-      //----- SCENE -----
       let model;
       //delete this variable if not using the mesh when done
       let modelMesh;
       let isModelLoaded = false;
-
+      
       //for dragcontrols
       let objects = []; 
-
-
+      
+      
       let mouse;
       let raycaster;
- 
-
-
+      let isDragging = false;
+      
+      
+      
+      
+      //----- SCENE -----
       const scene = new THREE.Scene();
       const background = new THREE.TextureLoader().load('src/assets/background-1.jpg');
       scene.background = background;
@@ -79,8 +81,8 @@ const SceneInit = () => {
         modelMesh = model.getObjectByName('Object_7');
         
         //flag as draggable
-        modelMesh.userData.draggable = true;
-        modelMesh.userData.name = 'dog';
+        // modelMesh.userData.draggable = true;
+        // modelMesh.userData.name = 'dog';
         
         objects.push(model);
         objects.push(modelMesh);
@@ -93,6 +95,19 @@ const SceneInit = () => {
       
 
 
+      // ----- RAYCASTING -----
+      //for picking model up with mouse
+      raycaster = new THREE.Raycaster();
+
+      // Movement plane when dragging
+      let movementPlane;
+      const planeGeometry = new THREE.PlaneGeometry(100, 100);
+      const floorMaterial = new THREE.MeshLambertMaterial({ color: 0x777777 })
+      movementPlane = new THREE.Mesh(planeGeometry, floorMaterial);
+      movementPlane.visible = false, // Hide it..
+      scene.add(movementPlane);
+
+
 
       
       // ----- PHYSICS -----
@@ -103,8 +118,8 @@ const SceneInit = () => {
       //time for physics
       const timeStep = 1 / 60;
 
-
-
+      
+      // -- FLOOR --
       //create floor
       const groundBody = new CANNON.Body({
         type: CANNON.Body.STATIC,
@@ -118,7 +133,7 @@ const SceneInit = () => {
       physicsWorld.addBody(groundBody);
 
 
-
+      // -- BOX --
       //create box to use as hitbox for models
       const halfExtents = new CANNON.Vec3();
       if(isModelLoaded){
@@ -127,10 +142,20 @@ const SceneInit = () => {
       const boxShape = new CANNON.Box(halfExtents);
       const boxBody = new CANNON.Body({ mass: 10, shape: boxShape });
       boxBody.position.set(0, 15, 0);
-      
       // objects.push(boxBody);
       physicsWorld.addBody(boxBody);
       
+
+      // -- JOINT --
+      // Joint body, to later constraint the cube
+      let jointBody;
+      let jointConstraint;
+      const jointShape = new CANNON.Sphere(0.1);
+      jointBody = new CANNON.Body({ mass: 0 });
+      jointBody.addShape(jointShape);
+      jointBody.collisionFilterGroup = 0;
+      jointBody.collisionFilterMask = 0;
+      physicsWorld.addBody(jointBody);
 
 
 
@@ -150,8 +175,8 @@ const SceneInit = () => {
 
 
       //----- CONTROLS ----- DELETE WHEN FINISHED -----
-      const orbitControls = new OrbitControls( camera, renderer.domElement );
-      orbitControls.update();
+      // const orbitControls = new OrbitControls( camera, renderer.domElement );
+      // orbitControls.update();
 
 
 
@@ -161,14 +186,6 @@ const SceneInit = () => {
         // options...
       })
   
-
-
-
-
-      // ----- RAYCASTING -----
-      //for picking model up with mouse
-      raycaster = new THREE.Raycaster();
-
 
 
       //----- ANIMATE -----
@@ -196,6 +213,121 @@ const SceneInit = () => {
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
       });
+
+
+
+      // ----- EVENT LISTENERS FOR MOUSE INTERACTION ----- (picking models up) -----
+      window.addEventListener('pointerdown', (event) => {
+        // Cast a ray from where the mouse is pointing and
+        // see if we hit something
+        const hitPoint = getHitPoint(event.clientX, event.clientY, modelMesh, camera)
+      
+        // Return if the cube wasn't hit
+        if (!hitPoint) {
+          return
+        }
+      
+        // Move the movement plane on the z-plane of the hit
+        moveMovementPlane(hitPoint, camera)
+      
+        // Create the constraint between the cube body and the joint body
+        addJointConstraint(hitPoint, boxBody)
+      
+        // Set the flag to trigger pointermove on next frame so the
+        // movementPlane has had time to move
+        requestAnimationFrame(() => {
+          isDragging = true
+        })
+      })
+
+      window.addEventListener('pointermove', (event) => {
+        if (!isDragging) {
+          return
+        }
+      
+        // Project the mouse onto the movement plane
+        const hitPoint = getHitPoint(event.clientX, event.clientY, movementPlane, camera)
+      
+        if (hitPoint) {
+          // Move the cannon constraint on the contact point
+          moveJoint(hitPoint)
+        }
+      })
+      
+      window.addEventListener('pointerup', () => {
+        isDragging = false
+      
+        // Remove the mouse constraint from the world
+        removeJointConstraint()
+      })
+      
+      
+      // This function moves the virtual movement plane for the mouseJoint to move in
+      function moveMovementPlane(point, camera) {
+        // Center at mouse position
+        movementPlane.position.copy(point)
+      
+        // Make it face toward the camera
+        movementPlane.quaternion.copy(camera.quaternion)
+      }
+      
+      
+      // Returns an hit point if there's a hit with the mesh,
+      // otherwise returns undefined
+      function getHitPoint(clientX, clientY, mesh, camera) {
+        // Get 3D point form the client x y
+        const mouse = new THREE.Vector2()
+        mouse.x = (clientX / window.innerWidth) * 2 - 1
+        mouse.y = -((clientY / window.innerHeight) * 2 - 1)
+      
+        // Get the picking ray from the point
+        raycaster.setFromCamera(mouse, camera)
+      
+        // Find out if there's a hit
+        const hits = raycaster.intersectObject(mesh)
+      
+        // Return the closest hit or undefined
+        return hits.length > 0 ? hits[0].point : undefined
+      }
+      
+      // Add a constraint between the cube and the jointBody
+      // in the initeraction position
+      function addJointConstraint(position, constrainedBody) {
+        // Vector that goes from the body to the clicked point
+        const vector = new CANNON.Vec3().copy(position).vsub(constrainedBody.position)
+      
+        // Apply anti-quaternion to vector to tranform it into the local body coordinate system
+        const antiRotation = constrainedBody.quaternion.inverse()
+        const pivot = antiRotation.vmult(vector) // pivot is not in local body coordinates
+      
+        // Move the cannon click marker body to the click position
+        jointBody.position.copy(position)
+      
+        // Create a new constraint
+        // The pivot for the jointBody is zero
+        jointConstraint = new CANNON.PointToPointConstraint(constrainedBody, pivot, jointBody, new CANNON.Vec3(0, 0, 0))
+      
+        // Add the constraint to world
+        physicsWorld.addConstraint(jointConstraint)
+      }
+      
+      // This functions moves the joint body to a new postion in space
+      // and updates the constraint
+      function moveJoint(position) {
+        jointBody.position.copy(position)
+        jointConstraint.update()
+      }
+      
+      // Remove constraint from world
+      function removeJointConstraint() {
+        physicsWorld.removeConstraint(jointConstraint)
+        jointConstraint = undefined
+      }
+
+
+
+
+
 
    
     }, []);
