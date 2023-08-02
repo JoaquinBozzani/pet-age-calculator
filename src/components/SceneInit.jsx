@@ -4,7 +4,6 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
-import { SimplifyModifier } from 'three/addons/modifiers/SimplifyModifier.js';
 
 import * as CANNON from 'cannon-es';
 import CannonDebugger from 'cannon-es-debugger';
@@ -17,12 +16,15 @@ const SceneInit = () => {
       let model;
       //delete this variable if not using the mesh when done
       let modelMesh;
-
       let isModelLoaded = false;
+
+      //for dragcontrols
+      let objects = []; 
+
 
       let mouse;
       let raycaster;
-      let selectedModel;
+ 
 
 
       const scene = new THREE.Scene();
@@ -49,7 +51,6 @@ const SceneInit = () => {
       //----- MODELS -----
       //dog
       const gltfLoader = new GLTFLoader();
-
       //DRACOLoader instance to decode compressed mesh data
       const dracoLoader = new DRACOLoader();
       dracoLoader.setDecoderPath( '/examples/jsm/libs/draco/' );
@@ -61,18 +62,28 @@ const SceneInit = () => {
       // called when the resource is loaded
       (gltf) => {
         model = gltf.scene;
+        const material = new THREE.MeshBasicMaterial({color: 'antiquewhite'});
+        
+        //change model material to whatever you want (give it colors, textures, etc)
+        model.traverse(function(node) {
+          if (node.isMesh) {
+            node.material = material;
+          }
+        });
+
         //add model to scene
         scene.add(model);
+
         
         //get mesh 
-        //ONLY HERE IF I NEED IT IN THE FUTURE DELETE IF NOT USING WHEN IM DONE WITH THIS 
         modelMesh = model.getObjectByName('Object_7');
         
         //flag as draggable
         modelMesh.userData.draggable = true;
         modelMesh.userData.name = 'dog';
         
-        
+        objects.push(model);
+        objects.push(modelMesh);
         isModelLoaded = true;
       },
       (xhr) => {
@@ -80,7 +91,9 @@ const SceneInit = () => {
         console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
       });
       
-      
+
+
+
       
       // ----- PHYSICS -----
       //world for simulated physics
@@ -89,6 +102,8 @@ const SceneInit = () => {
       });
       //time for physics
       const timeStep = 1 / 60;
+
+
 
       //create floor
       const groundBody = new CANNON.Body({
@@ -102,17 +117,18 @@ const SceneInit = () => {
       groundBody.position.set(0, 0, 0);
       physicsWorld.addBody(groundBody);
 
+
+
       //create box to use as hitbox for models
-      const size = 1;
       const halfExtents = new CANNON.Vec3();
       if(isModelLoaded){
-        halfExtents.setFromObject(model);
+        halfExtents.setFromObject(modelMesh); 
       };
       const boxShape = new CANNON.Box(halfExtents);
       const boxBody = new CANNON.Body({ mass: 10, shape: boxShape });
       boxBody.position.set(0, 15, 0);
       
-      physicsWorld.addBody(boxBody);
+      // objects.push(boxBody);
       physicsWorld.addBody(boxBody);
       
 
@@ -131,9 +147,13 @@ const SceneInit = () => {
       document.body.appendChild(renderer.domElement);
 
 
+
+
       //----- CONTROLS ----- DELETE WHEN FINISHED -----
-      const controls = new OrbitControls( camera, renderer.domElement );
-      controls.update();
+      const orbitControls = new OrbitControls( camera, renderer.domElement );
+      orbitControls.update();
+
+
 
 
       //----- CANNON DEBUGGER ----- DELETE WHEN FINISHED -----
@@ -147,34 +167,8 @@ const SceneInit = () => {
 
       // ----- RAYCASTING -----
       //for picking model up with mouse
-      mouse = new THREE.Vector2();
       raycaster = new THREE.Raycaster();
 
-      function translateMousePosition() {
-        // calculate pointer position in normalized device coordinates
-        // (-1 to +1) for both components
-        mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-        mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-      }
-
-
-      function onClick( event ) {
-        translateMousePosition();
-
-        raycaster.setFromCamera(mouse, camera);
-        const found = raycaster.intersectObjects(scene.children);
-        if(found.length > 0 && found[0].object.userData.draggable) {
-          selectedModel = found[0].object;
-          console.log(selectedModel.userData)
-          
-        }
-
-      }
-      
-
-      function onMouseMove() {
-        translateMousePosition();
-      }
 
 
       //----- ANIMATE -----
@@ -183,11 +177,13 @@ const SceneInit = () => {
         
         if(isModelLoaded) {
           model.position.copy(boxBody.position);
-          // model.position.y -= 1;
+
           model.quaternion.copy(boxBody.quaternion);
         }
-        
+
+        //delete debugger when done
         cannonDebugger.update() // Update the CannonDebugger meshes
+
         renderer.render(scene, camera); //render the threejs scene
         window.requestAnimationFrame(animate); 
       };
@@ -200,17 +196,12 @@ const SceneInit = () => {
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
       });
-   
-      window.addEventListener('mousemove', onMouseMove)
-      window.addEventListener( 'click', onClick );
 
-
-   
-   
    
     }, []);
 
     
+
   return (
       <div>
         <canvas id='webgl'></canvas>
