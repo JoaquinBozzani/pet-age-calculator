@@ -13,14 +13,10 @@ const SceneInit = () => {
     //THREE.JS
     useEffect(() => {
       let model;
-      //delete this variable if not using the mesh when done
       let modelMesh;
       let isModelLoaded = false;
       
-      //for dragcontrols
-      let objects = []; 
-      
-      
+    
       let mouse;
       let raycaster;
       let isDragging = false;
@@ -30,7 +26,7 @@ const SceneInit = () => {
       
       //----- SCENE -----
       const scene = new THREE.Scene();
-      const background = new THREE.TextureLoader().load('src/assets/background-1.jpg');
+      const background = new THREE.TextureLoader().load('src/assets/white-room.jpg');
       scene.background = background;
       
   
@@ -50,6 +46,22 @@ const SceneInit = () => {
       scene.add(directionalLight);
       
 
+
+      // // ----- GROUND -----
+      // //not the physics one, the threejs one 
+      // //create ground
+      // const groundGeometry = new THREE.PlaneGeometry(100, 100);
+      // const groundMaterial = new THREE.MeshBasicMaterial({color: 'white', side: THREE.DoubleSide});
+      // const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+      // //rotate ground
+      // ground.rotation.x = Math.PI / 2;
+      // ground.position.set(0, 0, 0);
+      // //add it to scene
+      // scene.add(ground);
+
+
+
+
       //----- MODELS -----
       //dog
       const gltfLoader = new GLTFLoader();
@@ -64,7 +76,7 @@ const SceneInit = () => {
       // called when the resource is loaded
       (gltf) => {
         model = gltf.scene;
-        const material = new THREE.MeshBasicMaterial({color: 'antiquewhite'});
+        const material = new THREE.MeshBasicMaterial({color: 'orangered'});
         
         //change model material to whatever you want (give it colors, textures, etc)
         model.traverse(function(node) {
@@ -73,24 +85,15 @@ const SceneInit = () => {
           }
         });
 
+        model.castShadow = true;
+        
         //add model to scene
         scene.add(model);
-
         
         //get mesh 
         modelMesh = model.getObjectByName('Object_7');
-        
-        //flag as draggable
-        // modelMesh.userData.draggable = true;
-        // modelMesh.userData.name = 'dog';
-        
-        objects.push(model);
-        objects.push(modelMesh);
+
         isModelLoaded = true;
-      },
-      (xhr) => {
-        //shows model loading
-        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
       });
       
 
@@ -126,6 +129,7 @@ const SceneInit = () => {
         //infinite ground
         shape: new CANNON.Plane(),
       });
+      
       //rotate ground by 90deg
       groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
       //set position
@@ -133,11 +137,28 @@ const SceneInit = () => {
       physicsWorld.addBody(groundBody);
 
 
+      
+      // -- WALLS --
+      //same as floor but upright
+      // const wallBody = new CANNON.Body({
+      //   type: CANNON.Body.STATIC,
+      //   //infinite ground
+      //   shape: new CANNON.Plane(),
+      // });
+      // wallBody.quaternion.setFromEuler(-Math.PI / 1, 2, 0);
+      // wallBody.position.set(0, 0, -10);
+      // physicsWorld.addBody(wallBody);
+
+
+
+
+
       // -- BOX --
       //create box to use as hitbox for models
-      const halfExtents = new CANNON.Vec3();
+      // const halfExtents = new CANNON.Vec3();
+      const halfExtents = new CANNON.Vec3(1, 1, 1);
       if(isModelLoaded){
-        halfExtents.setFromObject(modelMesh); 
+        // halfExtents.setFromObject(modelMesh); 
       };
       const boxShape = new CANNON.Box(halfExtents);
       const boxBody = new CANNON.Body({ mass: 10, shape: boxShape });
@@ -168,6 +189,7 @@ const SceneInit = () => {
         canvas,
         antialias: true,
       });
+      renderer.shadowMap.enabled = true;
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.body.appendChild(renderer.domElement);
 
@@ -175,8 +197,8 @@ const SceneInit = () => {
 
 
       //----- CONTROLS ----- DELETE WHEN FINISHED -----
-      // const orbitControls = new OrbitControls( camera, renderer.domElement );
-      // orbitControls.update();
+      const orbitControls = new OrbitControls( camera, renderer.domElement );
+      orbitControls.update();
 
 
 
