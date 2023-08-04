@@ -10,7 +10,7 @@ import CannonDebugger from 'cannon-es-debugger';
 
 const SceneInit = () => {
 
-    //THREE.JS
+    //THREE.JS / CANNON.ES
     useEffect(() => {
       let model;
       let modelMesh;
@@ -37,7 +37,7 @@ const SceneInit = () => {
           1,
           1000
       );
-      camera.position.set(0, 10, 40);
+      camera.position.set(0, 900, 50);
     
   
       //----- LIGHTS -----
@@ -47,19 +47,40 @@ const SceneInit = () => {
       
 
 
-      // // ----- GROUND -----
-      // //not the physics one, the threejs one 
-      // //create ground
-      // const groundGeometry = new THREE.PlaneGeometry(100, 100);
-      // const groundMaterial = new THREE.MeshBasicMaterial({color: 'white', side: THREE.DoubleSide});
-      // const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-      // //rotate ground
-      // ground.rotation.x = Math.PI / 2;
-      // ground.position.set(0, 0, 0);
-      // //add it to scene
-      // scene.add(ground);
+      // ----- WALLS -----
+      const planeGeo = new THREE.PlaneGeometry( 100.1, 100.1 );
+      
+      // const planeTop = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
+      // planeTop.position.y = 100;
+      // planeTop.rotateX( Math.PI / 2 );
+      // scene.add( planeTop );
 
+      const planeBottom = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
+      planeBottom.rotateX( - Math.PI / 2 );
+      // scene.add( planeBottom );
 
+      const planeFront = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0x7f7fff } ) );
+      planeFront.position.z = 50;
+      planeFront.position.y = 50;
+      planeFront.rotateY( Math.PI );
+      scene.add( planeFront );
+
+      const planeBack = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xff7fff } ) );
+      planeBack.position.z = - 50;
+      planeBack.position.y = 50;
+      scene.add( planeBack );
+
+      const planeRight = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0x00ff00 } ) );
+      planeRight.position.x = 50;
+      planeRight.position.y = 50;
+      planeRight.rotateY( - Math.PI / 2 );
+      scene.add( planeRight );
+
+      const planeLeft = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xff0000 } ) );
+      planeLeft.position.x = - 50;
+      planeLeft.position.y = 50;
+      planeLeft.rotateY( Math.PI / 2 );
+      scene.add( planeLeft );
 
 
       //----- MODELS -----
@@ -76,6 +97,7 @@ const SceneInit = () => {
       // called when the resource is loaded
       (gltf) => {
         model = gltf.scene;
+        // model.scale.set(0.5, 0.5, 0.5);
         const material = new THREE.MeshBasicMaterial({color: 'orangered'});
         
         //change model material to whatever you want (give it colors, textures, etc)
@@ -85,8 +107,7 @@ const SceneInit = () => {
           }
         });
 
-        model.castShadow = true;
-        
+
         //add model to scene
         scene.add(model);
         
@@ -139,33 +160,23 @@ const SceneInit = () => {
 
       
       // -- WALLS --
-      //same as floor but upright
-      // const wallBody = new CANNON.Body({
-      //   type: CANNON.Body.STATIC,
-      //   //infinite ground
-      //   shape: new CANNON.Plane(),
-      // });
-      // wallBody.quaternion.setFromEuler(-Math.PI / 1, 2, 0);
-      // wallBody.position.set(0, 0, -10);
-      // physicsWorld.addBody(wallBody);
-
 
 
 
 
       // -- BOX --
       //create box to use as hitbox for models
-      // const halfExtents = new CANNON.Vec3();
       const halfExtents = new CANNON.Vec3(1, 1, 1);
       if(isModelLoaded){
-        // halfExtents.setFromObject(modelMesh); 
+        // halfExtents.setFromObject(modelMesh.geometry.boundingBox);
       };
       const boxShape = new CANNON.Box(halfExtents);
       const boxBody = new CANNON.Body({ mass: 10, shape: boxShape });
-      boxBody.position.set(0, 15, 0);
-      // objects.push(boxBody);
+      boxBody.position.set(0, 100, 0);
+      //add
       physicsWorld.addBody(boxBody);
-      
+
+
 
       // -- JOINT --
       // Joint body, to later constraint the cube
@@ -208,6 +219,7 @@ const SceneInit = () => {
         // options...
       })
   
+      
 
 
       //----- ANIMATE -----
@@ -216,8 +228,14 @@ const SceneInit = () => {
         
         if(isModelLoaded) {
           model.position.copy(boxBody.position);
-
           model.quaternion.copy(boxBody.quaternion);
+          if( (boxBody.position.x  > 50) || (boxBody.position.y > 50) ) {
+            boxBody.position.set(0, 1, 0);
+            boxBody.angularVelocity.set(0, 0, 0);
+            boxBody.velocity.set(0, 0, 0);
+            boxBody.inertia.set(0, 0, 0);
+            console.log(boxBody);
+          }
         }
 
         //delete debugger when done
