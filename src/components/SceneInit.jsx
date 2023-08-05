@@ -17,7 +17,6 @@ const SceneInit = () => {
       let isModelLoaded = false;
       
     
-      let mouse;
       let raycaster;
       let isDragging = false;
       
@@ -26,7 +25,8 @@ const SceneInit = () => {
       
       //----- SCENE -----
       const scene = new THREE.Scene();
-      const background = new THREE.TextureLoader().load('src/assets/white-room.jpg');
+      // const background = new THREE.TextureLoader().load('src/assets/white-room.jpg');
+      const background = new THREE.Color('white');
       scene.background = background;
       
   
@@ -37,47 +37,50 @@ const SceneInit = () => {
           1,
           1000
       );
-      camera.position.set(0, 900, 50);
-    
+      camera.position.set(0, 30, 70);
+      
   
+      
       //----- LIGHTS -----
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-      directionalLight.castShadow = true;
-      scene.add(directionalLight);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+      // directionalLight.castShadow = true;
+      // directionalLight.position.set(0, 80, 0)
+      scene.add(ambientLight);
       
 
 
       // ----- WALLS -----
       const planeGeo = new THREE.PlaneGeometry( 100.1, 100.1 );
+      const planeMat = new THREE.MeshPhongMaterial( { color: 0xffffff } )
       
-      // const planeTop = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
-      // planeTop.position.y = 100;
-      // planeTop.rotateX( Math.PI / 2 );
-      // scene.add( planeTop );
+      const planeTop = new THREE.Mesh( planeGeo, planeMat);
+      planeTop.position.y = 60;
+      planeTop.rotateX( Math.PI / 2 );
+      scene.add( planeTop );
 
-      const planeBottom = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
-      planeBottom.rotateX( - Math.PI / 2 );
+      // const planeBottom = new THREE.Mesh( planeGeo, planeMat);
+      // planeBottom.rotateX( - Math.PI / 2 );
       // scene.add( planeBottom );
 
-      const planeFront = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0x7f7fff } ) );
-      planeFront.position.z = 50;
+      const planeFront = new THREE.Mesh( planeGeo, planeMat);
+      planeFront.position.z = 10;
       planeFront.position.y = 50;
       planeFront.rotateY( Math.PI );
       scene.add( planeFront );
 
-      const planeBack = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xff7fff } ) );
-      planeBack.position.z = - 50;
+      const planeBack = new THREE.Mesh( planeGeo, planeMat);
+      planeBack.position.z = - 30;
       planeBack.position.y = 50;
       scene.add( planeBack );
 
-      const planeRight = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0x00ff00 } ) );
-      planeRight.position.x = 50;
+      const planeRight = new THREE.Mesh( planeGeo, planeMat);
+      planeRight.position.x = 55;
       planeRight.position.y = 50;
       planeRight.rotateY( - Math.PI / 2 );
       scene.add( planeRight );
 
-      const planeLeft = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xff0000 } ) );
-      planeLeft.position.x = - 50;
+      const planeLeft = new THREE.Mesh( planeGeo, planeMat);
+      planeLeft.position.x = - 55;
       planeLeft.position.y = 50;
       planeLeft.rotateY( Math.PI / 2 );
       scene.add( planeLeft );
@@ -97,7 +100,7 @@ const SceneInit = () => {
       // called when the resource is loaded
       (gltf) => {
         model = gltf.scene;
-        // model.scale.set(0.5, 0.5, 0.5);
+        model.scale.set(1.5, 1.5, 1.5);
         const material = new THREE.MeshBasicMaterial({color: 'orangered'});
         
         //change model material to whatever you want (give it colors, textures, etc)
@@ -137,7 +140,7 @@ const SceneInit = () => {
       // ----- PHYSICS -----
       //world for simulated physics
       const physicsWorld = new CANNON.World({
-        gravity: new CANNON.Vec3(0, -9.81, 0),
+        gravity: new CANNON.Vec3(0, 0, 0),
       });
       //time for physics
       const timeStep = 1 / 60;
@@ -160,7 +163,50 @@ const SceneInit = () => {
 
       
       // -- WALLS --
+      //TOP
+      const topPlaneBody = new CANNON.Body({
+        type: CANNON.Body.STATIC,
+        shape: new CANNON.Plane(),
+      });
+      topPlaneBody.position.copy(planeTop.position);
+      topPlaneBody.quaternion.copy(planeTop.quaternion);
+      physicsWorld.addBody(topPlaneBody);
 
+      //FRONT
+      const frontPlaneBody = new CANNON.Body({
+        type: CANNON.Body.STATIC,
+        shape: new CANNON.Plane(),
+      });
+      frontPlaneBody.position.copy(planeFront.position);
+      frontPlaneBody.quaternion.copy(planeFront.quaternion);
+      physicsWorld.addBody(frontPlaneBody);
+
+      //BACK
+      const backPlaneBody = new CANNON.Body({
+        type: CANNON.Body.STATIC,
+        shape: new CANNON.Plane(),
+      });
+      backPlaneBody.position.copy(planeBack.position);
+      backPlaneBody.quaternion.copy(planeBack.quaternion);
+      physicsWorld.addBody(backPlaneBody);
+
+      //RIGHT
+      const rightPlaneBody = new CANNON.Body({
+        type: CANNON.Body.STATIC,
+        shape: new CANNON.Plane(),
+      });
+      rightPlaneBody.position.copy(planeRight.position);
+      rightPlaneBody.quaternion.copy(planeRight.quaternion);
+      physicsWorld.addBody(rightPlaneBody);
+
+      //LEFT
+      const leftPlaneBody = new CANNON.Body({
+        type: CANNON.Body.STATIC,
+        shape: new CANNON.Plane(),
+      });
+      leftPlaneBody.position.copy(planeLeft.position);
+      leftPlaneBody.quaternion.copy(planeLeft.quaternion);
+      physicsWorld.addBody(leftPlaneBody);
 
 
 
@@ -171,8 +217,8 @@ const SceneInit = () => {
         // halfExtents.setFromObject(modelMesh.geometry.boundingBox);
       };
       const boxShape = new CANNON.Box(halfExtents);
-      const boxBody = new CANNON.Body({ mass: 10, shape: boxShape });
-      boxBody.position.set(0, 100, 0);
+      const boxBody = new CANNON.Body({ mass: 5, shape: boxShape });
+      boxBody.position.set(0, 1, 0);
       //add
       physicsWorld.addBody(boxBody);
 
@@ -190,9 +236,6 @@ const SceneInit = () => {
       physicsWorld.addBody(jointBody);
 
 
-
-
-
       
       //----- RENDERER -----
       const canvas = document.getElementById('webgl');
@@ -208,8 +251,8 @@ const SceneInit = () => {
 
 
       //----- CONTROLS ----- DELETE WHEN FINISHED -----
-      const orbitControls = new OrbitControls( camera, renderer.domElement );
-      orbitControls.update();
+      // const orbitControls = new OrbitControls( camera, renderer.domElement );
+      // orbitControls.update();
 
 
 
@@ -221,7 +264,6 @@ const SceneInit = () => {
   
       
 
-
       //----- ANIMATE -----
       const animate = () => {
         physicsWorld.step(timeStep); //update physics
@@ -229,13 +271,6 @@ const SceneInit = () => {
         if(isModelLoaded) {
           model.position.copy(boxBody.position);
           model.quaternion.copy(boxBody.quaternion);
-          if( (boxBody.position.x  > 50) || (boxBody.position.y > 50) ) {
-            boxBody.position.set(0, 1, 0);
-            boxBody.angularVelocity.set(0, 0, 0);
-            boxBody.velocity.set(0, 0, 0);
-            boxBody.inertia.set(0, 0, 0);
-            console.log(boxBody);
-          }
         }
 
         //delete debugger when done
