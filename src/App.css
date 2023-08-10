@@ -31,7 +31,49 @@ isolation: isolate;
 
 
 /* ----- STYLES ----- */
+#root {
+    font-family: 'Recursive', sans-serif;
+    user-select: none;
+}
+
+/* so you can drag the model around and not select everything in the page */
+#root::selection {
+    background-color: transparent;
+}
+
+
+
+/* ----- NAVBAR ----- */
+.navbar {
+    position: absolute;
+    display: flex;
+    justify-content: space-between;
+    width: 100vw;
+    padding-left: 5px;
+    z-index: 1;
+}
+
+.toggle-container {
+    padding: 5px;
+}
+
+
+
+/* ----- CALCULATOR ----- */
+.calculator-container {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    z-index: 0;
+}
 
 .calculator {
-    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    width:30%;
 }

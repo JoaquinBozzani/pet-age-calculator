@@ -223,7 +223,7 @@ const SceneInit = () => {
       const halfExtents = new CANNON.Vec3(1, 1, 1);
       const boxShape = new CANNON.Box(halfExtents);
       const boxBody = new CANNON.Body({ mass: 5, shape: boxShape });
-      boxBody.position.set(0, 1, 0);
+      boxBody.position.set(60, -70, 20);
       //add
       physicsWorld.addBody(boxBody);
 
