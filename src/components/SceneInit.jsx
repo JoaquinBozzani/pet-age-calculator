@@ -1,12 +1,10 @@
 import React, { useEffect } from 'react';
 
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 import * as CANNON from 'cannon-es';
-import CannonDebugger from 'cannon-es-debugger';
 
 const SceneInit = () => {
 
@@ -22,10 +20,8 @@ const SceneInit = () => {
       
       
       
-      
       //----- SCENE -----
       const scene = new THREE.Scene();
-      // const background = new THREE.TextureLoader().load('src/assets/white-room.jpg');
       const background = new THREE.Color('white');
       scene.background = background;
       
@@ -42,25 +38,22 @@ const SceneInit = () => {
   
       
       //----- LIGHTS -----
-      const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-      // directionalLight.castShadow = true;
-      // directionalLight.position.set(0, 80, 0)
-      scene.add(ambientLight);
+      const light = new THREE.DirectionalLight(0xffffff, 1);
+      light.position.set(20, 30, 10);
+      light.target.position.set(0, 0, 0);
+      light.castShadow = true;
+      scene.add(light);
       
 
 
       // ----- WALLS -----
       const planeGeo = new THREE.PlaneGeometry( 100.1, 100.1 );
-      const planeMat = new THREE.MeshPhongMaterial( { color: 0xffffff } )
+      const planeMat = new THREE.MeshPhongMaterial( { color: 0xffffff, opacity: 0, transparent: true, depthWrite: false } );
       
       const planeTop = new THREE.Mesh( planeGeo, planeMat);
       planeTop.position.y = 60;
       planeTop.rotateX( Math.PI / 2 );
       scene.add( planeTop );
-
-      // const planeBottom = new THREE.Mesh( planeGeo, planeMat);
-      // planeBottom.rotateX( - Math.PI / 2 );
-      // scene.add( planeBottom );
 
       const planeFront = new THREE.Mesh( planeGeo, planeMat);
       planeFront.position.z = 10;
@@ -85,42 +78,57 @@ const SceneInit = () => {
       planeLeft.rotateY( Math.PI / 2 );
       scene.add( planeLeft );
 
+      const planeBottom = new THREE.Mesh( planeGeo, planeMat);
+      planeBottom.position.y = 0;
+      planeBottom.rotateX( Math.PI / 2 );
+      planeBottom.receiveShadow = true
+      scene.add( planeBottom );
+
+      planeGeo.receiveShadow = true;
 
       //----- MODELS -----
+
       //dog
       const gltfLoader = new GLTFLoader();
       //DRACOLoader instance to decode compressed mesh data
       const dracoLoader = new DRACOLoader();
       dracoLoader.setDecoderPath( '/examples/jsm/libs/draco/' );
       gltfLoader.setDRACOLoader(dracoLoader);
-
+      
+      const modelMaterial = new THREE.MeshBasicMaterial();
+      modelMaterial.castShadow = true;
 
       
       gltfLoader.load('./src/assets/models/beagle/scene.gltf',
       // called when the resource is loaded
       (gltf) => {
         model = gltf.scene;
-        model.scale.set(1.5, 1.5, 1.5);
-        const material = new THREE.MeshBasicMaterial({color: 'orangered'});
+        model.scale.set(3.5, 3.5, 3.5);
         
         //change model material to whatever you want (give it colors, textures, etc)
         model.traverse(function(node) {
           if (node.isMesh) {
-            node.material = material;
+            node.material = modelMaterial;
+            node.castShadow = true;
           }
         });
-
 
         //add model to scene
         scene.add(model);
         
         //get mesh 
         modelMesh = model.getObjectByName('Object_7');
-
+        modelMesh.castShadow = true;
         isModelLoaded = true;
       });
-      
 
+
+      const textures = ['burnt.jpg', 'flowers.jpg', 'fungus.jpg', 'gold.jpg', 'gradient.jpg', 'jester.jpg', 'leopard.jpg', 'lines.jpg', 'paint.jpg', 'pink.jpg', 'rectangle.jpg', 'roof.jpg', 'sand.jpg', 'wall.jpg', 'water.jpg'];
+
+      const texture = new THREE.TextureLoader().load(`./src/assets/models/textures/${textures[0]}`, (image) => {
+        modelMaterial.map = image;
+      });
+      console.log(texture)
 
       // ----- RAYCASTING -----
       //for picking model up with mouse
@@ -135,7 +143,6 @@ const SceneInit = () => {
       scene.add(movementPlane);
 
 
-
       
       // ----- PHYSICS -----
       //world for simulated physics
@@ -144,6 +151,7 @@ const SceneInit = () => {
       });
       //time for physics
       const timeStep = 1 / 60;
+
 
       
       // -- FLOOR --
@@ -213,9 +221,6 @@ const SceneInit = () => {
       // -- BOX --
       //create box to use as hitbox for models
       const halfExtents = new CANNON.Vec3(1, 1, 1);
-      if(isModelLoaded){
-        // halfExtents.setFromObject(modelMesh.geometry.boundingBox);
-      };
       const boxShape = new CANNON.Box(halfExtents);
       const boxBody = new CANNON.Body({ mass: 5, shape: boxShape });
       boxBody.position.set(0, 1, 0);
@@ -244,24 +249,10 @@ const SceneInit = () => {
         antialias: true,
       });
       renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.body.appendChild(renderer.domElement);
 
-
-
-
-      //----- CONTROLS ----- DELETE WHEN FINISHED -----
-      // const orbitControls = new OrbitControls( camera, renderer.domElement );
-      // orbitControls.update();
-
-
-
-
-      //----- CANNON DEBUGGER ----- DELETE WHEN FINISHED -----
-      const cannonDebugger = new CannonDebugger(scene, physicsWorld, {
-        // options...
-      })
-  
       
 
       //----- ANIMATE -----
@@ -273,14 +264,13 @@ const SceneInit = () => {
           model.quaternion.copy(boxBody.quaternion);
         }
 
-        //delete debugger when done
-        cannonDebugger.update() // Update the CannonDebugger meshes
-
+      
         renderer.render(scene, camera); //render the threejs scene
         window.requestAnimationFrame(animate); 
       };
       animate();
   
+
 
       // ----- RESIZE -----  
       window.addEventListener('resize', () => {
@@ -290,11 +280,12 @@ const SceneInit = () => {
       });
 
 
-
+      // ---------------------------------------------------------------------------
       // ----- EVENT LISTENERS FOR MOUSE INTERACTION ----- (picking models up) -----
       window.addEventListener('pointerdown', (event) => {
         // Cast a ray from where the mouse is pointing and
         // see if we hit something
+
         const hitPoint = getHitPoint(event.clientX, event.clientY, modelMesh, camera)
       
         // Return if the cube wasn't hit
@@ -398,12 +389,6 @@ const SceneInit = () => {
         physicsWorld.removeConstraint(jointConstraint)
         jointConstraint = undefined
       }
-
-
-
-
-
-
    
     }, []);
 

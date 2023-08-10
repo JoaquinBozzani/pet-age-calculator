@@ -2,7 +2,7 @@ import React from 'react'
 
 const Calculator = () => {
   return (
-    <div>calculator</div>
+    <div className='calculator'>calculator</div>
   )
 }
 
