@@ -2,11 +2,8 @@ import React, { useState } from 'react'
 import './toggleButton.css';
 
 
-const Navbar = ({ handleToggleData }) => {
-  const [petButton, setPetButton] = useState(false);
+const Navbar = ({ togglePet, setTogglePet }) => {
 
-  // pass data to parent component (Main)
-  handleToggleData(petButton);
 
   return (
       <nav className='navbar'>
@@ -16,7 +13,7 @@ const Navbar = ({ handleToggleData }) => {
           {/* DOG / CAT SELECTOR */}
           <div className='toggle-container'>
               <label className="toggle">
-                  <input type="checkbox" onClick={() => setPetButton(!petButton)} />
+                  <input type="checkbox" onClick={() => setTogglePet(!togglePet)} />
                   <span className="slider"></span>
                   <span className="labels" data-on="CAT" data-off="DOG"></span>
               </label>

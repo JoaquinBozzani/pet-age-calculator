@@ -1,18 +1,15 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Navbar from './Navbar'
 import Calculator from './Calculator'
 
 
 const Main = () => {
-    let toggleData;
-    const handleToggleData = (data) => {
-        toggleData = data;
-    }
+    const [togglePet, setTogglePet] = useState(false);
 
     return (
     <>
-        <Navbar handleToggleData={handleToggleData}></Navbar>
-        <Calculator ></Calculator>
+        <Navbar togglePet = {togglePet} setTogglePet = {setTogglePet}></Navbar>
+        <Calculator togglePet = {togglePet}></Calculator>
     </>
     )
 }
