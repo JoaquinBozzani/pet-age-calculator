@@ -2,6 +2,7 @@
 .toggle {
     --width: 80px;
     --height: calc(var(--width) / 3);
+    --transition: all 0.1s ease-in-out;
 
     position: relative;
     display: inline-block;
@@ -26,7 +27,7 @@
     height: 100%;
     border-radius: var(--height);
     background-color: #ccc;
-    transition: all 0.4s ease-in-out;
+    transition: var(--transition);
 }
 .toggle .slider::before {
     content: '';
@@ -38,7 +39,7 @@
     border-radius: calc(var(--height) / 2);
     background-color: #fff;
     box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.3);
-    transition: all 0.4s ease-in-out;
+    transition: var(--transition);
 }
 
 /* Adding slider effect */
@@ -55,7 +56,7 @@
     height: 100%;
     font-size: 12px;
     font-family: sans-serif;
-    transition: all 0.4s ease-in-out;
+    transition: var(--transition);
 }
 
 .toggle .labels::after {
@@ -65,7 +66,7 @@
     color: #4d4d4d;
     opacity: 1;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
-    transition: all 0.4s ease-in-out;
+    transition: var(--transition);
 }
 
 .toggle .labels::before {
@@ -75,7 +76,7 @@
     color: #4d4d4d;
     opacity: 0;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
-    transition: all 0.4s ease-in-out;
+    transition: var(--transition);
 }
 
 .toggle input:checked~.labels::after {

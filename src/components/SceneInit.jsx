@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 
 import * as THREE from 'three';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
@@ -10,9 +11,13 @@ const SceneInit = () => {
 
     //THREE.JS / CANNON.ES
     useEffect(() => {
-      let model;
-      let modelMesh;
-      let isModelLoaded = false;
+      let dogModel;
+      let dogModelMesh;
+      let isDogModelLoaded = false;
+
+      let catModel;
+      let catModelMesh;
+      let isCatModelLoaded = false;
       
     
       let raycaster;
@@ -38,10 +43,12 @@ const SceneInit = () => {
   
       
       //----- LIGHTS -----
-      const light = new THREE.DirectionalLight(0xffffff, 1);
-      light.position.set(20, 30, 10);
-      light.target.position.set(0, 0, 0);
-      light.castShadow = true;
+      // const light = new THREE.DirectionalLight(0xffffff, 1);
+      // light.position.set(20, 30, 10);
+      // light.target.position.set(0, 0, 0);
+      // scene.add(light);
+
+      const light = new THREE.AmbientLight(0xffffff, 1);
       scene.add(light);
       
 
@@ -81,54 +88,110 @@ const SceneInit = () => {
       const planeBottom = new THREE.Mesh( planeGeo, planeMat);
       planeBottom.position.y = 0;
       planeBottom.rotateX( Math.PI / 2 );
-      planeBottom.receiveShadow = true
       scene.add( planeBottom );
 
-      planeGeo.receiveShadow = true;
 
       //----- MODELS -----
 
-      //dog
+      //  TEXTURES
+      const textures = ['burnt.jpg', 'flowers.jpg', 'fungus.jpg', 'gold.jpg', 'gradient.jpg', 'jester.jpg', 'leopard.jpg', 'lines.jpg', 'paint.jpg', 'pink.jpg', 'rectangle.jpg', 'roof.jpg', 'sand.jpg', 'wall.jpg', 'water.jpg'];
+
+
+
+      const dogTexture = new THREE.TextureLoader().load(`./src/assets/models/textures/${textures[0]}`);
+      
+      
+
+      // ----- DOG -----
       const gltfLoader = new GLTFLoader();
       //DRACOLoader instance to decode compressed mesh data
       const dracoLoader = new DRACOLoader();
       dracoLoader.setDecoderPath( '/examples/jsm/libs/draco/' );
       gltfLoader.setDRACOLoader(dracoLoader);
       
-      const modelMaterial = new THREE.MeshBasicMaterial();
-      modelMaterial.castShadow = true;
+      const dogModelMaterial = new THREE.MeshBasicMaterial();
+      dogModelMaterial.map = dogTexture;
 
       
       gltfLoader.load('./src/assets/models/beagle/scene.gltf',
       // called when the resource is loaded
       (gltf) => {
-        model = gltf.scene;
-        model.scale.set(3.5, 3.5, 3.5);
+        dogModel = gltf.scene;
+        dogModel.scale.set(3.5, 3.5, 3.5);
         
         //change model material to whatever you want (give it colors, textures, etc)
-        model.traverse(function(node) {
+        dogModel.traverse(function(node) {
           if (node.isMesh) {
-            node.material = modelMaterial;
-            node.castShadow = true;
+            node.material = dogModelMaterial;
           }
         });
 
         //add model to scene
-        scene.add(model);
+        scene.add(dogModel);
         
         //get mesh 
-        modelMesh = model.getObjectByName('Object_7');
-        modelMesh.castShadow = true;
-        isModelLoaded = true;
+        dogModelMesh = dogModel.getObjectByName('Object_7');
+        isDogModelLoaded = true;
       });
 
 
-      const textures = ['burnt.jpg', 'flowers.jpg', 'fungus.jpg', 'gold.jpg', 'gradient.jpg', 'jester.jpg', 'leopard.jpg', 'lines.jpg', 'paint.jpg', 'pink.jpg', 'rectangle.jpg', 'roof.jpg', 'sand.jpg', 'wall.jpg', 'water.jpg'];
 
-      const texture = new THREE.TextureLoader().load(`./src/assets/models/textures/${textures[0]}`, (image) => {
-        modelMaterial.map = image;
+      // ----- CAT -----
+      const objLoader = new OBJLoader();
+
+  
+      const catTexture = new THREE.TextureLoader().load(`./src/assets/models/textures/${textures[3]}`);
+
+      // load a resource
+      objLoader.load(
+        // resource URL
+        './src/assets/models/cat/Cat_01.obj',
+        // called when resource is loaded
+        function ( object ) {
+          catModel = object;
+          // set scale
+          catModel.scale.set(0.013, 0.013, 0.013);
+          console.log(catModel)
+        
+
+          catModelMesh = catModel.children[0];
+          console.log(catModelMesh)
+          
+          
+          
+          
+          catModel.position.set(53, 0, 0);
+          catModel.lookAt(50, 0, -180);
+
+          catModelMesh.material.map = catTexture;
+         
+          scene.add(catModel);
+          isCatModelLoaded = true;
       });
-      console.log(texture)
+
+      
+
+
+
+
+
+
+
+
+
+
+
+      
+
+      
+      
+
+      
+      
+     
+      
+
+      
 
       // ----- RAYCASTING -----
       //for picking model up with mouse
@@ -248,8 +311,6 @@ const SceneInit = () => {
         canvas,
         antialias: true,
       });
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.body.appendChild(renderer.domElement);
 
@@ -259,9 +320,9 @@ const SceneInit = () => {
       const animate = () => {
         physicsWorld.step(timeStep); //update physics
         
-        if(isModelLoaded) {
-          model.position.copy(boxBody.position);
-          model.quaternion.copy(boxBody.quaternion);
+        if(isDogModelLoaded) {
+          dogModel.position.copy(boxBody.position);
+          dogModel.quaternion.copy(boxBody.quaternion);
         }
 
       
@@ -286,7 +347,7 @@ const SceneInit = () => {
         // Cast a ray from where the mouse is pointing and
         // see if we hit something
 
-        const hitPoint = getHitPoint(event.clientX, event.clientY, modelMesh, camera)
+        const hitPoint = getHitPoint(event.clientX, event.clientY, dogModelMesh, camera)
       
         // Return if the cube wasn't hit
         if (!hitPoint) {

@@ -1,8 +1,9 @@
 import React, { useRef, useState } from 'react'
 
+
 const Calculator = () => {
-  const [result, setResult] = useState(0)
-  const inputRef = useRef(null)
+  const [result, setResult] = useState(0);
+  const inputRef = useRef(null);
   
 
   const calculatePetAge = () => {
@@ -10,9 +11,11 @@ const Calculator = () => {
     
     // 16 ln(dog age) + 31 = human age --> equation
     age = Math.round(Math.log(age) * 16 + 31);
-
-    setResult(age);
-  } 
+    
+    // this makes sure result is never -infinity
+    age < 0 ? setResult(0) :  setResult(age);
+    console.log(petButton)
+  };
   
   
   
@@ -23,7 +26,7 @@ const Calculator = () => {
       <div className='calculator'>
         <p>How old is your dog?</p>
 
-        <input type="number" placeholder='...' ref={inputRef} />
+        <input type="number" min={0} placeholder='...' ref={inputRef} />
         <button onClick={calculatePetAge}>Calculate</button>
         <p className='result'>Your dog is {result} years old in human years</p>
       
