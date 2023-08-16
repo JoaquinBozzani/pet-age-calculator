@@ -1,9 +1,8 @@
 import React, { useRef } from 'react'
 
 
-const Calculator = ({ togglePet, calculatePetAge, result }) => {
-  const inputRef = useRef(null);
-  console.log(inputRef)
+const Calculator = ({ togglePet, forwardedRef ,calculatePetAge, result }) => {
+  
 
   return (
     <div className='calculator-container'>
@@ -12,9 +11,9 @@ const Calculator = ({ togglePet, calculatePetAge, result }) => {
       <div className='calculator'>
         <p>How old is your {togglePet ? 'cat' : 'dog'}?</p>
 
-        <input type="number" min={0} placeholder='...' ref={inputRef} />
+        <input type="number" min={1} placeholder='...' ref={forwardedRef} />
 
-        <button onClick={() => calculatePetAge(inputRef.current.value)}>Calculate</button>
+        <button onClick={() => calculatePetAge(forwardedRef.current.value)}>Calculate</button>
 
         <p className='result'>Your {togglePet ? 'cat' : 'dog'} is {result} years old in human years</p>
       </div>

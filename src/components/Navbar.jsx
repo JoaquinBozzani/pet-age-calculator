@@ -1,9 +1,13 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import './toggleButton.css';
 
 
-const Navbar = ({ togglePet, setTogglePet }) => {
+const Navbar = ({ togglePet, setTogglePet, forwardedRef, calculatePetAge}) => {
 
+  // when user toggles from dog to cat, update the result of the calculator
+  useEffect(() => {
+    calculatePetAge(forwardedRef.current.value);
+  }, [togglePet]);
 
   return (
       <nav className='navbar'>

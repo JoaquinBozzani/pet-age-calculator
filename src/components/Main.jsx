@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import Navbar from './Navbar'
 import Calculator from './Calculator'
 
@@ -6,6 +6,7 @@ import Calculator from './Calculator'
 const Main = () => {
     const [togglePet, setTogglePet] = useState(false);
     const [result, setResult] = useState(0);
+    const inputRef = useRef(null);
 
 
     // ----- CALCULATOR FUNCTIONS -----
@@ -45,9 +46,9 @@ const Main = () => {
 
     return (
     <>
-        <Navbar togglePet={togglePet} setTogglePet={setTogglePet}></Navbar>
+        <Navbar togglePet={togglePet} setTogglePet={setTogglePet} forwardedRef={inputRef} calculatePetAge={calculatePetAge}></Navbar>
 
-        <Calculator togglePet={togglePet} calculatePetAge={calculatePetAge} result={result}></Calculator>
+        <Calculator togglePet={togglePet} forwardedRef={inputRef} calculatePetAge={calculatePetAge} result={result}></Calculator>
     </>
     )
 }
