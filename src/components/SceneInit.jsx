@@ -94,11 +94,11 @@ const SceneInit = () => {
       //----- MODELS -----
 
       //  TEXTURES
-      const textures = ['burnt.jpg', 'flowers.jpg', 'fungus.jpg', 'gold.jpg', 'gradient.jpg', 'jester.jpg', 'leopard.jpg', 'lines.jpg', 'paint.jpg', 'pink.jpg', 'rectangle.jpg', 'roof.jpg', 'sand.jpg', 'wall.jpg', 'water.jpg'];
+      const modelTextures = ['burnt.jpg', 'flowers.jpg', 'fungus.jpg', 'gold.jpg', 'gradient.jpg', 'jester.jpg', 'leopard.jpg', 'lines.jpg', 'paint.jpg', 'pink.jpg', 'rectangle.jpg', 'roof.jpg', 'sand.jpg', 'wall.jpg', 'water.jpg'];
 
 
 
-      const dogTexture = new THREE.TextureLoader().load(`./src/assets/models/textures/${textures[0]}`);
+      const dogTexture = new THREE.TextureLoader().load(`./src/assets/models/textures/${modelTextures[0]}`);
       
       
 
@@ -140,7 +140,7 @@ const SceneInit = () => {
       const objLoader = new OBJLoader();
 
   
-      const catTexture = new THREE.TextureLoader().load(`./src/assets/models/textures/${textures[3]}`);
+      const catTexture = new THREE.TextureLoader().load(`./src/assets/models/textures/${modelTextures[14]}`);;
 
       // load a resource
       objLoader.load(
@@ -151,17 +151,14 @@ const SceneInit = () => {
           catModel = object;
           // set scale
           catModel.scale.set(0.013, 0.013, 0.013);
-          console.log(catModel)
+          // console.log(catModel)
         
 
           catModelMesh = catModel.children[0];
-          console.log(catModelMesh)
-          
-          
+          // console.log(catModelMesh)
           
           
           catModel.position.set(53, 0, 0);
-          catModel.lookAt(50, 0, -180);
 
           catModelMesh.material.map = catTexture;
          
@@ -169,29 +166,6 @@ const SceneInit = () => {
           isCatModelLoaded = true;
       });
 
-      
-
-
-
-
-
-
-
-
-
-
-
-      
-
-      
-      
-
-      
-      
-     
-      
-
-      
 
       // ----- RAYCASTING -----
       //for picking model up with mouse
@@ -319,13 +293,16 @@ const SceneInit = () => {
       //----- ANIMATE -----
       const animate = () => {
         physicsWorld.step(timeStep); //update physics
-        
         if(isDogModelLoaded) {
           dogModel.position.copy(boxBody.position);
           dogModel.quaternion.copy(boxBody.quaternion);
         }
 
-      
+        if(isCatModelLoaded) {
+          catModel.lookAt(dogModel.position);
+        }
+
+
         renderer.render(scene, camera); //render the threejs scene
         window.requestAnimationFrame(animate); 
       };
@@ -341,8 +318,18 @@ const SceneInit = () => {
       });
 
 
+
       // ---------------------------------------------------------------------------
-      // ----- EVENT LISTENERS FOR MOUSE INTERACTION ----- (picking models up) -----
+      // ----- EVENT LISTENERS FOR MOUSE INTERACTION ----- 
+
+      window.addEventListener('click', () => {
+        // catTexture.load(`./src/assets/models/textures/${modelTextures[0]}`);
+        // catModelMesh.material.map = catTexture;
+      })
+
+
+
+      // ----- (picking models up) -----
       window.addEventListener('pointerdown', (event) => {
         // Cast a ray from where the mouse is pointing and
         // see if we hit something
