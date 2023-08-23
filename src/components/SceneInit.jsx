@@ -40,14 +40,9 @@ const SceneInit = () => {
       );
       camera.position.set(0, 30, 70);
       
-  
-      
-      //----- LIGHTS -----
-      // const light = new THREE.DirectionalLight(0xffffff, 1);
-      // light.position.set(20, 30, 10);
-      // light.target.position.set(0, 0, 0);
-      // scene.add(light);
 
+
+      //----- LIGHT -----
       const light = new THREE.AmbientLight(0xffffff, 1);
       scene.add(light);
       
@@ -92,15 +87,11 @@ const SceneInit = () => {
 
 
       //----- MODELS -----
-
       //  TEXTURES
-      const modelTextures = ['burnt.jpg', 'flowers.jpg', 'fungus.jpg', 'gold.jpg', 'gradient.jpg', 'jester.jpg', 'leopard.jpg', 'lines.jpg', 'paint.jpg', 'pink.jpg', 'rectangle.jpg', 'roof.jpg', 'sand.jpg', 'wall.jpg', 'water.jpg'];
+      const video = document.getElementById('videotexture');
+      const videoTexture = new THREE.VideoTexture(video);
 
 
-
-      const dogTexture = new THREE.TextureLoader().load(`./src/assets/models/textures/${modelTextures[0]}`);
-      
-      
 
       // ----- DOG -----
       const gltfLoader = new GLTFLoader();
@@ -110,9 +101,8 @@ const SceneInit = () => {
       gltfLoader.setDRACOLoader(dracoLoader);
       
       const dogModelMaterial = new THREE.MeshBasicMaterial();
-      dogModelMaterial.map = dogTexture;
+      dogModelMaterial.map = videoTexture;
 
-      
       gltfLoader.load('./src/assets/models/beagle/scene.gltf',
       // called when the resource is loaded
       (gltf) => {
@@ -139,9 +129,6 @@ const SceneInit = () => {
       // ----- CAT -----
       const objLoader = new OBJLoader();
 
-  
-      const catTexture = new THREE.TextureLoader().load(`./src/assets/models/textures/${modelTextures[14]}`);;
-
       // load a resource
       objLoader.load(
         // resource URL
@@ -151,26 +138,22 @@ const SceneInit = () => {
           catModel = object;
           // set scale
           catModel.scale.set(0.013, 0.013, 0.013);
-          // console.log(catModel)
-        
-
+          // get mesh
           catModelMesh = catModel.children[0];
-          // console.log(catModelMesh)
-          
-          
+          // set position
           catModel.position.set(53, 0, 0);
-
-          catModelMesh.material.map = catTexture;
+          // give him a texture
+          catModelMesh.material.map = videoTexture;
          
           scene.add(catModel);
           isCatModelLoaded = true;
       });
 
 
+
       // ----- RAYCASTING -----
       //for picking model up with mouse
       raycaster = new THREE.Raycaster();
-
       // Movement plane when dragging
       let movementPlane;
       const planeGeometry = new THREE.PlaneGeometry(100, 100);
@@ -190,7 +173,6 @@ const SceneInit = () => {
       const timeStep = 1 / 60;
 
 
-      
       // -- FLOOR --
       //create floor
       const groundBody = new CANNON.Body({
@@ -198,7 +180,6 @@ const SceneInit = () => {
         //infinite ground
         shape: new CANNON.Plane(),
       });
-      
       //rotate ground by 90deg
       groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
       //set position
@@ -255,7 +236,7 @@ const SceneInit = () => {
 
 
 
-      // -- BOX --
+      // ----- BOX -----
       //create box to use as hitbox for models
       const halfExtents = new CANNON.Vec3(1, 1, 1);
       const boxShape = new CANNON.Box(halfExtents);
@@ -288,7 +269,6 @@ const SceneInit = () => {
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.body.appendChild(renderer.domElement);
 
-      
 
       //----- ANIMATE -----
       const animate = () => {
@@ -302,13 +282,11 @@ const SceneInit = () => {
           catModel.lookAt(dogModel.position);
         }
 
-
         renderer.render(scene, camera); //render the threejs scene
         window.requestAnimationFrame(animate); 
       };
       animate();
   
-
 
       // ----- RESIZE -----  
       window.addEventListener('resize', () => {
@@ -321,14 +299,6 @@ const SceneInit = () => {
 
       // ---------------------------------------------------------------------------
       // ----- EVENT LISTENERS FOR MOUSE INTERACTION ----- 
-
-      window.addEventListener('click', () => {
-        // catTexture.load(`./src/assets/models/textures/${modelTextures[0]}`);
-        // catModelMesh.material.map = catTexture;
-      })
-
-
-
       // ----- (picking models up) -----
       window.addEventListener('pointerdown', (event) => {
         // Cast a ray from where the mouse is pointing and
@@ -444,6 +414,7 @@ const SceneInit = () => {
 
   return (
       <div>
+        <video src="src\assets\models\textures\texturetest.mp4" id='videotexture' autoPlay muted playsInLine loop></video>
         <canvas id='webgl'></canvas>
       </div>
   )
