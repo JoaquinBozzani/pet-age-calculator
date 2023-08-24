@@ -61,6 +61,30 @@ isolation: isolate;
     z-index: 1;
 }
 
+.title-container {
+    position: relative;
+}
+
+
+.title::after {
+    content: 'Pet Age Calculator';
+    position: absolute;
+    top: .9vh;
+    left: .5vw;
+    opacity: .2;
+}
+
+.title::before {
+    font-family: 'Qwitcher Grypen', cursive;
+    content: 'Pet Age Calculator';
+    position: absolute;
+    white-space: nowrap;
+    font-size: 1.5em;
+    top: 1.4vh;
+    left: 2.8vw;
+    opacity: .1;
+}
+
 .toggle-container {
     padding: 5px;
 }

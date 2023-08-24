@@ -11,8 +11,9 @@ const Navbar = ({ togglePet, setTogglePet, forwardedRef, calculatePetAge}) => {
 
   return (
       <nav className='navbar'>
-
-          <h1>Pet Age Calculator</h1>
+          <div className='title-container'>
+            <h1 className='title'>Pet Age Calculator</h1>
+          </div>
           
           {/* DOG / CAT SELECTOR */}
           <div className='toggle-container'>
