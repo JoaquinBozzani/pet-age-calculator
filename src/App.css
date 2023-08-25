@@ -79,7 +79,7 @@ isolation: isolate;
     animation-duration: 100s;
     animation-timing-function: linear;
     animation-iteration-count: infinite;
-    opacity: .7;
+    opacity: .2;
 }
 
 .navbar::before {
@@ -106,20 +106,27 @@ isolation: isolate;
     position: relative;
 }
 
+.title {
+    font-size: 1.8rem;
+    border-bottom: 1px dashed black;
+}
+
 .title::after {
     content: 'Pet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age Calculator';
     position: absolute;
     top: .9vh;
     left: .5vw;
+    font-size: 1.4rem;
     opacity: .1;
 }
 
 .title::before {
-    content: 'Pet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age Calculator';
+    content: 'Pet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age CalculatorPet Age Calculator';
     position: absolute;
     white-space: nowrap;
     top: 1.4vh;
     left: 2.8vw;
+    font-size: 1.5rem;
     opacity: .1;
 }
 
@@ -186,8 +193,9 @@ isolation: isolate;
 .calculator-button:hover {
     scale: 1.01;
     background: #f9f9f9;
-    transition: all 300ms ease-in-out;
+    transition: all 100ms ease-in-out;
 }
+
 
 
 /* ----- ANIMATION ----- */

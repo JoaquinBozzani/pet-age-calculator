@@ -6,7 +6,6 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 import * as CANNON from 'cannon-es';
-
 const SceneInit = () => {
 
     //THREE.JS / CANNON.ES
@@ -21,7 +20,6 @@ const SceneInit = () => {
     
       let raycaster;
       let isDragging = false;
-      
       
       
       //----- SCENE -----
@@ -303,21 +301,67 @@ const SceneInit = () => {
       });
 
 
+      // ----- AUDIO FILES -----  
+      const dogSounds = ['src/assets/sounds/dog/arf.mp3', 'src/assets/sounds/dog/bark_bork.mp3', 'src/assets/sounds/dog/bark.mp3', 'src/assets/sounds/dog/bork_bark.mp3', 'src/assets/sounds/dog/bork.mp3', 'src/assets/sounds/dog/ruff.mp3', 'src/assets/sounds/dog/woof_woof.mp3'];
+
+      const catSounds = ['src/assets/sounds/cat/meaou.mp3', 'src/assets/sounds/cat/meaow.mp3', 'src/assets/sounds/cat/meow.mp3', 'src/assets/sounds/cat/miaou.mp3', 'src/assets/sounds/cat/miau.mp3', 'src/assets/sounds/cat/purr.mp3', 'src/assets/sounds/cat/purrrr.mp3']
+
+      
+      function randomArrayElement(array) {
+        return array[Math.floor(Math.random() * array.length)];
+      }
+
+      function handleAudio(array) {
+        const sound = new Audio(randomArrayElement(array));
+        sound.play();
+      }
+      
 
       // ---------------------------------------------------------------------------
       // ----- EVENT LISTENERS FOR MOUSE INTERACTION ----- 
       // ----- (picking models up) -----
+      // for dog
       window.addEventListener('pointerdown', (event) => {
         // Cast a ray from where the mouse is pointing and
-        // see if we hit something
-
+        // see if it hit something
         const hitPoint = getHitPoint(event.clientX, event.clientY, dogModelMesh, camera)
       
         // Return if the cube wasn't hit
         if (!hitPoint) {
           return
         }
+
+        // play bark sound
+        handleAudio(dogSounds);
+
+
+        // Move the movement plane on the z-plane of the hit
+        moveMovementPlane(hitPoint, camera)
       
+        // Create the constraint between the cube body and the joint body
+        addJointConstraint(hitPoint, dogBoxBody)
+      
+        // Set the flag to trigger pointermove on next frame so the
+        // movementPlane has had time to move
+        requestAnimationFrame(() => {
+          isDragging = true
+        })
+      })
+
+      // for cat
+      window.addEventListener('pointerdown', (event) => {
+        // Cast a ray from where the mouse is pointing and
+        // see if it hit something
+        const hitPoint = getHitPoint(event.clientX, event.clientY, catModelMesh, camera)
+      
+        // Return if the cube wasn't hit
+        if (!hitPoint) {
+          return
+        }
+
+        // play meow sound
+        handleAudio(catSounds);
+
         // Move the movement plane on the z-plane of the hit
         moveMovementPlane(hitPoint, camera)
       
