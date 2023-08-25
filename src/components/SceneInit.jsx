@@ -18,7 +18,6 @@ const SceneInit = () => {
       let catModel;
       let catModelMesh;
       let isCatModelLoaded = false;
-      
     
       let raycaster;
       let isDragging = false;
@@ -52,45 +51,52 @@ const SceneInit = () => {
       const planeGeo = new THREE.PlaneGeometry( 100.1, 100.1 );
       const planeMat = new THREE.MeshPhongMaterial( { color: 0xffffff, opacity: 0, transparent: true, depthWrite: false } );
       
+      
+      //TOP
       const planeTop = new THREE.Mesh( planeGeo, planeMat);
       planeTop.position.y = 60;
       planeTop.rotateX( Math.PI / 2 );
       scene.add( planeTop );
 
+      //FRONT
       const planeFront = new THREE.Mesh( planeGeo, planeMat);
       planeFront.position.z = 10;
       planeFront.position.y = 50;
       planeFront.rotateY( Math.PI );
       scene.add( planeFront );
 
+      //BACK
       const planeBack = new THREE.Mesh( planeGeo, planeMat);
       planeBack.position.z = - 30;
       planeBack.position.y = 50;
       scene.add( planeBack );
 
+      // RIGHT
       const planeRight = new THREE.Mesh( planeGeo, planeMat);
       planeRight.position.x = 55;
       planeRight.position.y = 50;
       planeRight.rotateY( - Math.PI / 2 );
       scene.add( planeRight );
 
+      //LEFT
       const planeLeft = new THREE.Mesh( planeGeo, planeMat);
       planeLeft.position.x = - 55;
       planeLeft.position.y = 50;
       planeLeft.rotateY( Math.PI / 2 );
       scene.add( planeLeft );
 
+      //BOTTOM
       const planeBottom = new THREE.Mesh( planeGeo, planeMat);
       planeBottom.position.y = 0;
       planeBottom.rotateX( Math.PI / 2 );
       scene.add( planeBottom );
 
 
+
       //----- MODELS -----
       //  TEXTURES
       const video = document.getElementById('videotexture');
       const videoTexture = new THREE.VideoTexture(video);
-
 
 
       // ----- DOG -----
@@ -237,13 +243,14 @@ const SceneInit = () => {
 
 
       // ----- BOX -----
-      //create box to use as hitbox for models
       const halfExtents = new CANNON.Vec3(1, 1, 1);
       const boxShape = new CANNON.Box(halfExtents);
-      const boxBody = new CANNON.Body({ mass: 5, shape: boxShape });
-      boxBody.position.set(60, -70, 20);
+
+      //create box to use as hitbox for dog
+      const dogBoxBody = new CANNON.Body({ mass: 5, shape: boxShape });
+      dogBoxBody.position.set(60, -70, 20);
       //add
-      physicsWorld.addBody(boxBody);
+      physicsWorld.addBody(dogBoxBody);
 
 
 
@@ -274,11 +281,11 @@ const SceneInit = () => {
       const animate = () => {
         physicsWorld.step(timeStep); //update physics
         if(isDogModelLoaded) {
-          dogModel.position.copy(boxBody.position);
-          dogModel.quaternion.copy(boxBody.quaternion);
+          dogModel.position.copy(dogBoxBody.position);
+          dogModel.quaternion.copy(dogBoxBody.quaternion);
         }
 
-        if(isCatModelLoaded) {
+        if(isCatModelLoaded && isDogModelLoaded) {
           catModel.lookAt(dogModel.position);
         }
 
@@ -315,7 +322,7 @@ const SceneInit = () => {
         moveMovementPlane(hitPoint, camera)
       
         // Create the constraint between the cube body and the joint body
-        addJointConstraint(hitPoint, boxBody)
+        addJointConstraint(hitPoint, dogBoxBody)
       
         // Set the flag to trigger pointermove on next frame so the
         // movementPlane has had time to move
@@ -414,7 +421,7 @@ const SceneInit = () => {
 
   return (
       <div>
-        <video src="src\assets\models\textures\texturetest.mp4" id='videotexture' autoPlay muted playsInLine loop></video>
+        <video src="src\assets\models\textures\texturetest.mp4" id='videotexture' autoPlay muted playsInline loop></video>
         <canvas id='webgl'></canvas>
       </div>
   )

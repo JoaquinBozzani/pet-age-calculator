@@ -8,11 +8,10 @@ import Main from './components/Main';
 function App() {
 
   return (
-    <div>
+    <>
       <SceneInit></SceneInit>
       <Main></Main>
-      
-    </div>
+    </>
   )
 }
 
