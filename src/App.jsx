@@ -2,6 +2,8 @@ import React from 'react';
 import './App.css'
 import SceneInit from './components/SceneInit'
 import Main from './components/Main';
+import Footer from './components/Footer';
+
 
 
 
@@ -11,6 +13,7 @@ function App() {
     <>
       <SceneInit></SceneInit>
       <Main></Main>
+      <Footer></Footer>
     </>
   )
 }

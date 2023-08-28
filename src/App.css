@@ -143,9 +143,9 @@ isolation: isolate;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    height: 60vh;
+    height: 70vh;
     width: 100vw;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     font-weight: 500;
     z-index: 0;
 }
@@ -196,6 +196,20 @@ isolation: isolate;
     transition: all 100ms ease-in-out;
 }
 
+
+/* FOOTER */
+footer {
+    position: absolute;
+    top: 95vh;
+    left: 11vw;
+    width: 50%;
+    font-size: 0.6rem;
+    opacity: 0.8;
+}
+
+footer ul {
+    list-style: none;
+}
 
 
 /* ----- ANIMATION ----- */

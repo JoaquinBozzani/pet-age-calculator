@@ -6,6 +6,10 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 import * as CANNON from 'cannon-es';
+
+import './loader.css';
+import Loader from './Loader';
+
 const SceneInit = () => {
 
     //THREE.JS / CANNON.ES
@@ -96,11 +100,19 @@ const SceneInit = () => {
       const video = document.getElementById('videotexture');
       const videoTexture = new THREE.VideoTexture(video);
 
+      //LOADING SCREEN
+      const loadingManager = new THREE.LoadingManager();
+      const loadingScreen = document.querySelector('.lds-roller')
+
+
+      loadingManager.onLoad = function() {
+        loadingScreen.classList.add('hidden');
+      }
 
       // ----- DOG -----
-      const gltfLoader = new GLTFLoader();
+      const gltfLoader = new GLTFLoader(loadingManager);
       //DRACOLoader instance to decode compressed mesh data
-      const dracoLoader = new DRACOLoader();
+      const dracoLoader = new DRACOLoader(loadingManager);
       dracoLoader.setDecoderPath( '/examples/jsm/libs/draco/' );
       gltfLoader.setDRACOLoader(dracoLoader);
       
@@ -131,7 +143,7 @@ const SceneInit = () => {
 
 
       // ----- CAT -----
-      const objLoader = new OBJLoader();
+      const objLoader = new OBJLoader(loadingManager);
 
       // load a resource
       objLoader.load(
@@ -465,6 +477,7 @@ const SceneInit = () => {
 
   return (
       <div>
+        <Loader></Loader>
         <video src="src\assets\models\textures\texturetest.mp4" id='videotexture' autoPlay muted playsInline loop></video>
         <canvas id='webgl'></canvas>
       </div>
