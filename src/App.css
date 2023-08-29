@@ -73,7 +73,7 @@ isolation: isolate;
 
     -webkit-background-clip: text;
 	background-clip: text;
-    background-image: url('assets/models/textures/derelict.jpg');
+    background-image: var(--background-img);
     color: transparent;
     animation-name: MOVE-BG;
     animation-duration: 100s;
