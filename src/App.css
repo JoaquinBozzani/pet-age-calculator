@@ -35,7 +35,7 @@ isolation: isolate;
 #root {
     font-family: 'Recursive', sans-serif;
     user-select: none;
-    --background-img: url('assets/models/textures/derelict.JPG');
+    --background-img: url('../public/assets/models/textures/derelict.jpg');
 }
 
 /* so you can drag the model around and not select everything in the page */
