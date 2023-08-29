@@ -119,7 +119,7 @@ const SceneInit = () => {
       const dogModelMaterial = new THREE.MeshBasicMaterial();
       dogModelMaterial.map = videoTexture;
 
-      gltfLoader.load('dist/assets/models/beagle/scene.gltf',
+      gltfLoader.load('assets/models/beagle/scene.gltf',
       // called when the resource is loaded
       (gltf) => {
         dogModel = gltf.scene;
