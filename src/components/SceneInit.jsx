@@ -148,7 +148,7 @@ const SceneInit = () => {
       // load a resource
       objLoader.load(
         // resource URL
-        'dist/assets/models/cat/Cat_01.obj',
+        'assets/models/cat/Cat_01.obj',
         // called when resource is loaded
         function ( object ) {
           catModel = object;
@@ -314,9 +314,9 @@ const SceneInit = () => {
 
 
       // ----- AUDIO FILES -----  
-      const dogSounds = ['dist/assets/sounds/dog/arf.mp3', 'dist/assets/sounds/dog/bark_bork.mp3', 'dist/assets/sounds/dog/bark.mp3', 'dist/assets/sounds/dog/bork_bark.mp3', 'dist/assets/sounds/dog/bork.mp3', 'dist/assets/sounds/dog/ruff.mp3', 'dist/assets/sounds/dog/woof_woof.mp3'];
+      const dogSounds = ['assets/sounds/dog/arf.mp3', 'assets/sounds/dog/bark_bork.mp3', 'assets/sounds/dog/bark.mp3', 'assets/sounds/dog/bork_bark.mp3', 'assets/sounds/dog/bork.mp3', 'assets/sounds/dog/ruff.mp3', 'assets/sounds/dog/woof_woof.mp3'];
 
-      const catSounds = ['dist/assets/sounds/cat/meaou.mp3', 'dist/assets/sounds/cat/meaow.mp3', 'dist/assets/sounds/cat/meow.mp3', 'dist/assets/sounds/cat/miaou.mp3', 'dist/assets/sounds/cat/miau.mp3', 'dist/assets/sounds/cat/purr.mp3', 'dist/assets/sounds/cat/purrrr.mp3']
+      const catSounds = ['assets/sounds/cat/meaou.mp3', 'assets/sounds/cat/meaow.mp3', 'assets/sounds/cat/meow.mp3', 'assets/sounds/cat/miaou.mp3', 'assets/sounds/cat/miau.mp3', 'assets/sounds/cat/purr.mp3', 'assets/sounds/cat/purrrr.mp3']
 
       
       function randomArrayElement(array) {
@@ -478,7 +478,7 @@ const SceneInit = () => {
   return (
       <div>
         <Loader></Loader>
-        <video src="dist\assets\models\textures\texturetest.mp4" id='videotexture' autoPlay muted playsInline loop></video>
+        <video src="assets\models\textures\texturetest.mp4" id='videotexture' autoPlay muted playsInline loop></video>
         <canvas id='webgl'></canvas>
       </div>
   )
