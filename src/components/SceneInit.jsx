@@ -119,7 +119,7 @@ const SceneInit = () => {
       const dogModelMaterial = new THREE.MeshBasicMaterial();
       dogModelMaterial.map = videoTexture;
 
-      gltfLoader.load('./src/assets/models/beagle/scene.gltf',
+      gltfLoader.load('dist/assets/models/beagle/scene.gltf',
       // called when the resource is loaded
       (gltf) => {
         dogModel = gltf.scene;
@@ -148,7 +148,7 @@ const SceneInit = () => {
       // load a resource
       objLoader.load(
         // resource URL
-        './src/assets/models/cat/Cat_01.obj',
+        'dist/assets/models/cat/Cat_01.obj',
         // called when resource is loaded
         function ( object ) {
           catModel = object;
@@ -314,9 +314,9 @@ const SceneInit = () => {
 
 
       // ----- AUDIO FILES -----  
-      const dogSounds = ['src/assets/sounds/dog/arf.mp3', 'src/assets/sounds/dog/bark_bork.mp3', 'src/assets/sounds/dog/bark.mp3', 'src/assets/sounds/dog/bork_bark.mp3', 'src/assets/sounds/dog/bork.mp3', 'src/assets/sounds/dog/ruff.mp3', 'src/assets/sounds/dog/woof_woof.mp3'];
+      const dogSounds = ['dist/assets/sounds/dog/arf.mp3', 'dist/assets/sounds/dog/bark_bork.mp3', 'dist/assets/sounds/dog/bark.mp3', 'dist/assets/sounds/dog/bork_bark.mp3', 'dist/assets/sounds/dog/bork.mp3', 'dist/assets/sounds/dog/ruff.mp3', 'dist/assets/sounds/dog/woof_woof.mp3'];
 
-      const catSounds = ['src/assets/sounds/cat/meaou.mp3', 'src/assets/sounds/cat/meaow.mp3', 'src/assets/sounds/cat/meow.mp3', 'src/assets/sounds/cat/miaou.mp3', 'src/assets/sounds/cat/miau.mp3', 'src/assets/sounds/cat/purr.mp3', 'src/assets/sounds/cat/purrrr.mp3']
+      const catSounds = ['dist/assets/sounds/cat/meaou.mp3', 'dist/assets/sounds/cat/meaow.mp3', 'dist/assets/sounds/cat/meow.mp3', 'dist/assets/sounds/cat/miaou.mp3', 'dist/assets/sounds/cat/miau.mp3', 'dist/assets/sounds/cat/purr.mp3', 'dist/assets/sounds/cat/purrrr.mp3']
 
       
       function randomArrayElement(array) {
@@ -478,7 +478,7 @@ const SceneInit = () => {
   return (
       <div>
         <Loader></Loader>
-        <video src="src\assets\models\textures\texturetest.mp4" id='videotexture' autoPlay muted playsInline loop></video>
+        <video src="dist\assets\models\textures\texturetest.mp4" id='videotexture' autoPlay muted playsInline loop></video>
         <canvas id='webgl'></canvas>
       </div>
   )
