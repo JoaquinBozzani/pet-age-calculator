@@ -10,6 +10,8 @@ import * as CANNON from 'cannon-es';
 import './loader.css';
 import Loader from './Loader';
 
+import {dogSounds, catSounds} from './sounds.js'
+
 const SceneInit = () => {
 
     //THREE.JS / CANNON.ES
@@ -313,19 +315,13 @@ const SceneInit = () => {
       });
 
 
-      // ----- AUDIO FILES -----  
-      const dogSounds = ['assets/sounds/dog/arf.mp3', 'assets/sounds/dog/bark_bork.mp3', 'assets/sounds/dog/bark.mp3', 'assets/sounds/dog/bork_bark.mp3', 'assets/sounds/dog/bork.mp3', 'assets/sounds/dog/ruff.mp3', 'assets/sounds/dog/woof_woof.mp3'];
 
-      const catSounds = ['assets/sounds/cat/meaou.mp3', 'assets/sounds/cat/meaow.mp3', 'assets/sounds/cat/meow.mp3', 'assets/sounds/cat/miaou.mp3', 'assets/sounds/cat/miau.mp3', 'assets/sounds/cat/purr.mp3', 'assets/sounds/cat/purrrr.mp3']
-
-      
+      // ----- AUDIO -----  
       function randomArrayElement(array) {
         return array[Math.floor(Math.random() * array.length)];
       }
-
       function handleAudio(array) {
-        const sound = new Audio(randomArrayElement(array));
-        sound.play();
+        randomArrayElement(array).play();
       }
       
 
